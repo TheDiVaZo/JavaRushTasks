@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Human {
+    private List<Human> children = new ArrayList<>();
     public static int nextId = 0;
     private int id;
     protected int age;
@@ -12,8 +13,6 @@ public class Human {
     protected int course;
 
     protected int[] size;
-
-    protected boolean isSoldier;
 
     public static final int FIRST = 1;
     public static final int SECOND = 2;
@@ -29,10 +28,23 @@ public class Human {
         return bloodGroup;
     }
 
-    public Human(boolean isSoldier) {
-        this.isSoldier = isSoldier;
+    public Human(String name, int age) {
         this.id = nextId;
         nextId++;
+        this.name = name;
+        this.age = age;
+    }
+
+    public List<Human> getChildren() {
+        return Collections.unmodifiableList(children);
+    }
+
+    public void addChild(Human child) {
+        this.children.add(child);
+    }
+
+    public void removeChild(Human child) {
+        this.children.remove(child);
     }
 
     public int getAge() {
@@ -56,11 +68,7 @@ public class Human {
     }
 
     public void live() {
-        if (isSoldier)
-            fight();
-    }
 
-    public void fight() {
     }
 
     public int getId() {
