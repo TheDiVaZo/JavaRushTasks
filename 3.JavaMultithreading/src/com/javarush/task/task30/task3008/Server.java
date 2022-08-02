@@ -13,6 +13,16 @@ public class Server {
     private static class Handler extends Thread {
         private Socket socket;
 
+        private void notifyUsers(Connection connection, String userName) throws IOException {
+            for (Map.Entry<String, Connection> connectionEntry : connectionMap.entrySet()) {
+                String nameMapsUser = connectionEntry.getKey();
+                Connection connectionMapsUser = connectionEntry.getValue();
+                if(nameMapsUser.equals(userName)) continue;
+                connectionMapsUser.send(new Message(MessageType.USER_ADDED, userName));
+                connection.send(new Message(MessageType.USER_ADDED, nameMapsUser));
+            }
+        }
+
         private String serverHandshake(Connection connection) throws IOException, ClassNotFoundException {
             Message responseName = null;
             do {
