@@ -13,6 +13,16 @@ public class Server {
     private static class Handler extends Thread {
         private Socket socket;
 
+        private void serverMainLoop(Connection connection, String userName) throws IOException, ClassNotFoundException {
+            while (true) {
+                Message messageUser = connection.receive();
+                if (messageUser.getType()==(MessageType.TEXT)) {
+                    sendBroadcastMessage(new Message(MessageType.TEXT, userName + ": " + messageUser.getData()));
+                }
+                else ConsoleHelper.writeMessage("Ошибка");
+            }
+        }
+
         private void notifyUsers(Connection connection, String userName) throws IOException {
             for (Map.Entry<String, Connection> connectionEntry : connectionMap.entrySet()) {
                 String nameMapsUser = connectionEntry.getKey();
