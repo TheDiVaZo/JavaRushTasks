@@ -13,6 +13,25 @@ public class Server {
     private static class Handler extends Thread {
         private Socket socket;
 
+        public void run() {
+            System.out.println("установлено новое соединение с удаленным адресом " + socket.getRemoteSocketAddress());
+            String name = null;
+            try (Connection connection = new Connection(socket);) {
+                name = serverHandshake(connection);
+                sendBroadcastMessage(new Message(MessageType.USER_ADDED, name));
+                notifyUsers(connection, name);
+                serverMainLoop(connection, name);
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("произошла ошибка при обмене данными с удаленным адресом");
+            } finally {
+                if(name != null) {
+                    connectionMap.remove(name);
+                    sendBroadcastMessage(new Message(MessageType.USER_REMOVED, name));
+                }
+                System.out.println("соединение с удаленным адресом закрыто.");
+            }
+        }
+
         private void serverMainLoop(Connection connection, String userName) throws IOException, ClassNotFoundException {
             while (true) {
                 Message messageUser = connection.receive();
