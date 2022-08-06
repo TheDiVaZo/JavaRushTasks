@@ -54,7 +54,25 @@ public class Client {
                 e.printStackTrace();
                 clientConnected = false;
             }
+        }
 
+        protected void processIncomingMessage(String message) {
+            System.out.println(message);
+        }
+
+        protected void informAboutAddingNewUser(String userName) throws IOException {
+            System.out.println("Пользователь "+userName+" присоеденился к чату");
+        }
+
+        protected void informAboutDeletingNewUser(String userName) {
+            System.out.println("Пользователь "+userName+" покинул чат");
+        }
+
+        protected void notifyConnectionStatusChanged(boolean clientConnected) {
+            Client.this.clientConnected = clientConnected;
+            synchronized (Client.this) {
+                Client.this.notify();
+            }
         }
     }
 
