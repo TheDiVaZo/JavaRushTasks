@@ -6,6 +6,8 @@ import com.javarush.task.task30.task3008.Message;
 import com.javarush.task.task30.task3008.MessageType;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 
 public class Client {
     protected Connection connection;
@@ -42,5 +44,37 @@ public class Client {
 
     public class SocketThread extends Thread {
 
+        @Override
+        public void run() {
+            try {
+                connection = new Connection(new Socket(InetAddress.getByName(getServerAddress()),getServerPort()));
+                clientConnected = true;
+                Client.this.notify();
+            } catch (IOException e) {
+                e.printStackTrace();
+                clientConnected = false;
+            }
+
+        }
+    }
+
+    public void run() throws InterruptedException {
+        SocketThread connectedThread = getSocketThread();
+        connectedThread.setDaemon(true);
+        connectedThread.start();
+        synchronized (this) {
+            wait();
+            if(clientConnected) System.out.println("Соединение установлено. Для выхода наберите команду 'exit'.");
+            else System.out.println("Произошла ошибка во время работы клиента.");
+        }
+        while (clientConnected) {
+            String message = ConsoleHelper.readString();
+            if("exit".equals(message)) break;
+            if(shouldSendTextFromConsole()) sendTextMessage(message);
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        new Client().run();
     }
 }
