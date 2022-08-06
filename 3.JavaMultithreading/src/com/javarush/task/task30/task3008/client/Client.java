@@ -47,12 +47,11 @@ public class Client {
         @Override
         public void run() {
             try {
-                connection = new Connection(new Socket(InetAddress.getByName(getServerAddress()),getServerPort()));
-                clientConnected = true;
-                Client.this.notify();
-            } catch (IOException e) {
-                e.printStackTrace();
-                clientConnected = false;
+                connection = new Connection(new Socket(getServerAddress(),getServerPort()));
+                clientHandshake();
+                clientMainLoop();
+            } catch (IOException | ClassNotFoundException e) {
+                notifyConnectionStatusChanged(false);
             }
         }
 
